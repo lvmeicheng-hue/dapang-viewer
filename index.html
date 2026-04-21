@@ -476,37 +476,6 @@
                 '</div>';
         }
 
-        /* ========== Large ground arrow ========== */
-        .hotspot-big-arrow {
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-        .hotspot-big-arrow .big-arrow-wrap {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            animation: big-arrow-float 1.8s ease-in-out infinite;
-        }
-        .hotspot-big-arrow .big-arrow-svg {
-            width: 80px;
-            height: 80px;
-            filter: drop-shadow(0 0 16px rgba(26, 115, 232, 0.8))
-                    drop-shadow(0 0 40px rgba(26, 115, 232, 0.4));
-        }
-        .hotspot-big-arrow .big-arrow-label {
-            margin-left: 8px;
-            color: #fff;
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(26, 115, 232, 0.5);
-            white-space: nowrap;
-        }
-        @keyframes big-arrow-float {
-            0%, 100% { transform: translateX(0); opacity: 0.85; }
-            50% { transform: translateX(10px); opacity: 1; }
-        }
-
         // ============================================
         // Scale signboard frame with zoom level
         // ============================================
