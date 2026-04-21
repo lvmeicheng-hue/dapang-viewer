@@ -417,7 +417,7 @@
         var TARGET_YAW = 45;          // Center yaw of target area
         var SIGNBOARD_YAW = 48;       // 铁锅炖 white signboard (move right-down)
         var SIGNBOARD_PITCH = 5;      // Move down from 10 to 5
-        var STAIRCASE_YAW = 45;       // Staircase entrance (align with signboard direction)
+        var STAIRCASE_YAW = 60;       // Staircase entrance (right 15 degrees)
         var STAIRCASE_PITCH = 0;      // Move down to point to staircase entrance
         var SECOND_FLOOR_YAW = -20;    // "大胖当家" 2nd floor sign (left 25 degrees)
         var SECOND_FLOOR_PITCH = 30;  // Upper part of building
@@ -470,7 +470,7 @@
                 // Large ground arrow pointing UP-RIGHT toward signboard (close to ground, pointing to blue frame)
                 {
                     pitch: -15,
-                    yaw: SIGNBOARD_YAW - 10,
+                    yaw: SIGNBOARD_YAW + 5,
                     type: 'info',
                     createTooltipFunc: createBigArrow,
                     createTooltipArgs: { direction: 'up-right' }
