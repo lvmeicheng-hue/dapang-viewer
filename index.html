@@ -58,20 +58,21 @@
             cursor: pointer;
         }
         .hotspot-staircase .staircase-marker {
-            width: 140px;
+            width: 160px;
             background: linear-gradient(135deg, #1a73e8 0%, #4fc3f7 100%);
             border-radius: 12px;
-            padding: 10px 14px;
-            box-shadow: 0 4px 20px rgba(26, 115, 232, 0.5), 0 0 40px rgba(79, 195, 247, 0.3);
-            animation: staircase-pulse 2s ease-in-out infinite;
+            padding: 12px 16px;
+            box-shadow: 0 4px 24px rgba(26, 115, 232, 0.6), 0 0 50px rgba(79, 195, 247, 0.4);
+            animation: staircase-pulse 1.5s ease-in-out infinite;
             transform: translate(-50%, -50%);
             text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
         .hotspot-staircase .staircase-arrow {
-            font-size: 28px;
+            font-size: 36px;
             line-height: 1;
             color: #fff;
-            animation: arrow-up-bounce 1.2s ease-in-out infinite;
+            animation: arrow-up-bounce 1.0s ease-in-out infinite;
             display: block;
         }
         .hotspot-staircase .staircase-text {
@@ -87,8 +88,8 @@
             margin-top: 2px;
         }
         @keyframes staircase-pulse {
-            0%, 100% { box-shadow: 0 4px 20px rgba(26, 115, 232, 0.5), 0 0 40px rgba(79, 195, 247, 0.3); }
-            50% { box-shadow: 0 4px 30px rgba(26, 115, 232, 0.8), 0 0 60px rgba(79, 195, 247, 0.5); }
+            0%, 100% { box-shadow: 0 4px 24px rgba(26, 115, 232, 0.6), 0 0 50px rgba(79, 195, 247, 0.4); }
+            50% { box-shadow: 0 4px 36px rgba(26, 115, 232, 0.9), 0 0 70px rgba(79, 195, 247, 0.6); }
         }
         @keyframes arrow-up-bounce {
             0%, 100% { transform: translateY(0); }
@@ -410,12 +411,12 @@
         // - Staircase: below the signboard, at entrance
         // - 2nd floor: "大胖当家" red signboard at top
         // ============================================
-        var TARGET_YAW = 40;          // Center yaw of target area
-        var SIGNBOARD_YAW = 42;       // 铁锅炖 white signboard (move right to white sign)
-        var SIGNBOARD_PITCH = 10;     // Slightly above center
-        var STAIRCASE_YAW = 40;       // Staircase entrance (move right, point up)
-        var STAIRCASE_PITCH = 2;      // Move up toward staircase
-        var SECOND_FLOOR_YAW = 30;    // "大胖当家" 2nd floor sign (move left)
+        var TARGET_YAW = 45;          // Center yaw of target area
+        var SIGNBOARD_YAW = 48;       // 铁锅炖 white signboard (move right-down)
+        var SIGNBOARD_PITCH = 5;      // Move down from 10 to 5
+        var STAIRCASE_YAW = 45;       // Staircase entrance (align with signboard direction)
+        var STAIRCASE_PITCH = 0;      // Move down to point to staircase entrance
+        var SECOND_FLOOR_YAW = 20;    // "大胖当家" 2nd floor sign (move left BIG step)
         var SECOND_FLOOR_PITCH = 30;  // Upper part of building
 
         // Signboard frame base dimensions (at hfov=100)
@@ -490,7 +491,7 @@
             hotSpotDiv.innerHTML =
                 '<div class="staircase-marker">' +
                     '<span class="staircase-arrow">' +
-                        '<svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>' +
+                        '<svg width="36" height="36" viewBox="0 0 24 24" fill="white"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>' +
                     '</span>' +
                     '<div class="staircase-text">在此处上楼</div>' +
                     '<div class="staircase-sub">大胖铁锅炖 ▸ 二楼</div>' +
