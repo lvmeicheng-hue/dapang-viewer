@@ -317,6 +317,44 @@
             0%, 100% { transform: translateX(0); opacity: 0.85; }
             50% { transform: translateX(10px); opacity: 1; }
         }
+
+        /* ========== 2nd floor destination marker ========== */
+        .hotspot-destination {
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .hotspot-destination .destination-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            animation: destination-bounce 2s ease-in-out infinite;
+        }
+        .hotspot-destination .destination-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(231, 76, 60, 0.5), 0 0 30px rgba(243, 156, 18, 0.3);
+        }
+        .hotspot-destination .destination-text {
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 0 16px rgba(231, 76, 60, 0.5);
+            white-space: nowrap;
+            background: rgba(231, 76, 60, 0.8);
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+        @keyframes destination-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
     </style>
 </head>
 <body>
@@ -367,15 +405,18 @@
     <script>
         // ============================================
         // Configuration - target coordinates
-        // Based on the annotated screenshot:
-        // - Red box: 铁锅炖 white signboard on the RIGHT side
-        // - Red arrow: staircase entrance below the signboard
+        // Based on annotated screenshot:
+        // - Red box: 铁锅炖 white signboard (further right)
+        // - Staircase: below the signboard, at entrance
+        // - 2nd floor: "大胖当家" red signboard at top
         // ============================================
-        var TARGET_YAW = 25;          // Center yaw of 铁锅炖 area
-        var SIGNBOARD_YAW = 28;       // 铁锅炖 white signboard (right side)
-        var SIGNBOARD_PITCH = 8;      // Slightly above horizon
-        var STAIRCASE_YAW = 28;       // Staircase entrance (below the signboard)
-        var STAIRCASE_PITCH = -2;     // Near ground level
+        var TARGET_YAW = 35;          // Center yaw of target area
+        var SIGNBOARD_YAW = 35;       // 铁锅炖 white signboard (red box position)
+        var SIGNBOARD_PITCH = 10;     // Slightly above center
+        var STAIRCASE_YAW = 35;       // Staircase entrance (below signboard)
+        var STAIRCASE_PITCH = -3;     // Near ground level
+        var SECOND_FLOOR_YAW = 35;    // "大胖当家" 2nd floor sign
+        var SECOND_FLOOR_PITCH = 30;  // Upper part of building
 
         // Signboard frame base dimensions (at hfov=100)
         var BASE_HFOV = 100;
@@ -406,7 +447,7 @@
             hotSpotDebug: false,
 
             hotSpots: [
-                // Blue frame around 铁锅炖 white signboard (right side, red box position)
+                // Blue frame around 铁锅炖 white signboard (red box position)
                 {
                     pitch: SIGNBOARD_PITCH,
                     yaw: SIGNBOARD_YAW,
@@ -414,7 +455,7 @@
                     createTooltipFunc: createSignboardFrame,
                     createTooltipArgs: {}
                 },
-                // Staircase arrow + "在此处上楼" text (below the signboard)
+                // Staircase arrow + "在此处上楼" text (below signboard, pointing to entrance)
                 {
                     pitch: STAIRCASE_PITCH,
                     yaw: STAIRCASE_YAW,
@@ -422,12 +463,20 @@
                     createTooltipFunc: createStaircaseHotspot,
                     createTooltipArgs: {}
                 },
-                // Large ground arrow pointing to staircase entrance
+                // Large ground arrow pointing RIGHT toward staircase entrance
                 {
-                    pitch: -10,
-                    yaw: STAIRCASE_YAW - 5,
+                    pitch: -8,
+                    yaw: STAIRCASE_YAW - 12,
                     type: 'info',
                     createTooltipFunc: createBigArrow,
+                    createTooltipArgs: { direction: 'right' }
+                },
+                // 2nd floor destination marker on "大胖当家" signboard
+                {
+                    pitch: SECOND_FLOOR_PITCH,
+                    yaw: SECOND_FLOOR_YAW,
+                    type: 'info',
+                    createTooltipFunc: createSecondFloorMarker,
                     createTooltipArgs: {}
                 }
             ]
@@ -463,6 +512,9 @@
         // ============================================
         function createBigArrow(hotSpotDiv, args) {
             hotSpotDiv.classList.add('hotspot-big-arrow');
+            var arrowPath = args.direction === 'right'
+                ? 'M5 35 L50 35 L50 15 L95 50 L50 85 L50 65 L5 65 Z'
+                : 'M95 35 L50 35 L50 15 L5 50 L50 85 L50 65 L95 65 Z';
             hotSpotDiv.innerHTML =
                 '<div class="big-arrow-wrap">' +
                     '<svg class="big-arrow-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
@@ -470,9 +522,25 @@
                             '<stop offset="0%" style="stop-color:#4fc3f7;stop-opacity:1"/>' +
                             '<stop offset="100%" style="stop-color:#1a73e8;stop-opacity:1"/>' +
                         '</linearGradient></defs>' +
-                        '<path d="M5 35 L50 35 L50 15 L95 50 L50 85 L50 65 L5 65 Z" fill="url(#arrowGrad)" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>' +
+                        '<path d="' + arrowPath + '" fill="url(#arrowGrad)" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>' +
                     '</svg>' +
                     '<div class="big-arrow-label">上楼入口</div>' +
+                '</div>';
+        }
+
+        // ============================================
+        // Hotspot: 2nd floor destination marker
+        // ============================================
+        function createSecondFloorMarker(hotSpotDiv, args) {
+            hotSpotDiv.classList.add('hotspot-destination');
+            hotSpotDiv.innerHTML =
+                '<div class="destination-marker">' +
+                    '<div class="destination-icon">' +
+                        '<svg width="32" height="32" viewBox="0 0 24 24" fill="white">' +
+                            '<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>' +
+                        '</svg>' +
+                    '</div>' +
+                    '<div class="destination-text">大胖当家二楼</div>' +
                 '</div>';
         }
 
