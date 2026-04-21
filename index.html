@@ -286,6 +286,37 @@
         .pnlm-controls-container { display: none !important; }
         .pnlm-hotspot .pnlm-sprite { display: none !important; }
         .pnlm-hotspot { background: none !important; width: auto !important; height: auto !important; }
+
+        /* ========== Large ground arrow ========== */
+        .hotspot-big-arrow {
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .hotspot-big-arrow .big-arrow-wrap {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            animation: big-arrow-float 1.8s ease-in-out infinite;
+        }
+        .hotspot-big-arrow .big-arrow-svg {
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 0 16px rgba(26, 115, 232, 0.8))
+                    drop-shadow(0 0 40px rgba(26, 115, 232, 0.4));
+        }
+        .hotspot-big-arrow .big-arrow-label {
+            margin-left: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(26, 115, 232, 0.5);
+            white-space: nowrap;
+        }
+        @keyframes big-arrow-float {
+            0%, 100% { transform: translateX(0); opacity: 0.85; }
+            50% { transform: translateX(10px); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -335,15 +366,16 @@
 
     <script>
         // ============================================
-        // Configuration - target coordinates for 铁锅炖 sign
-        // In the panoramic image, the storefront is roughly centered (yaw ~0)
-        // The 铁锅炖 sign is on the right portion of the storefront (yaw ~20)
+        // Configuration - target coordinates
+        // Based on the annotated screenshot:
+        // - Red box: 铁锅炖 white signboard on the RIGHT side
+        // - Red arrow: staircase entrance below the signboard
         // ============================================
-        var TARGET_YAW = 20;          // Center yaw of 铁锅炖 sign
-        var STAIRCASE_YAW = 20;       // Staircase entrance (same area)
-        var STAIRCASE_PITCH = 8;
-        var SIGNBOARD_YAW = 20;       // 铁锅炖 signboard
-        var SIGNBOARD_PITCH = 8;
+        var TARGET_YAW = 25;          // Center yaw of 铁锅炖 area
+        var SIGNBOARD_YAW = 28;       // 铁锅炖 white signboard (right side)
+        var SIGNBOARD_PITCH = 8;      // Slightly above horizon
+        var STAIRCASE_YAW = 28;       // Staircase entrance (below the signboard)
+        var STAIRCASE_PITCH = -2;     // Near ground level
 
         // Signboard frame base dimensions (at hfov=100)
         var BASE_HFOV = 100;
@@ -374,7 +406,7 @@
             hotSpotDebug: false,
 
             hotSpots: [
-                // Signboard blue frame
+                // Blue frame around 铁锅炖 white signboard (right side, red box position)
                 {
                     pitch: SIGNBOARD_PITCH,
                     yaw: SIGNBOARD_YAW,
@@ -382,12 +414,20 @@
                     createTooltipFunc: createSignboardFrame,
                     createTooltipArgs: {}
                 },
-                // Staircase arrow + text
+                // Staircase arrow + "在此处上楼" text (below the signboard)
                 {
                     pitch: STAIRCASE_PITCH,
                     yaw: STAIRCASE_YAW,
                     type: 'info',
                     createTooltipFunc: createStaircaseHotspot,
+                    createTooltipArgs: {}
+                },
+                // Large ground arrow pointing to staircase entrance
+                {
+                    pitch: -10,
+                    yaw: STAIRCASE_YAW - 5,
+                    type: 'info',
+                    createTooltipFunc: createBigArrow,
                     createTooltipArgs: {}
                 }
             ]
@@ -415,7 +455,56 @@
             hotSpotDiv.classList.add('hotspot-signboard');
             hotSpotDiv.innerHTML =
                 '<div class="sign-frame" id="signFrame"></div>' +
-                '<div class="sign-label">大胖铁锅炖</div>';
+                '<div class="sign-label">铁锅炖上楼处</div>';
+        }
+
+        // ============================================
+        // Hotspot: Large ground arrow pointing to staircase
+        // ============================================
+        function createBigArrow(hotSpotDiv, args) {
+            hotSpotDiv.classList.add('hotspot-big-arrow');
+            hotSpotDiv.innerHTML =
+                '<div class="big-arrow-wrap">' +
+                    '<svg class="big-arrow-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+                        '<defs><linearGradient id="arrowGrad" x1="0%" y1="0%" x2="100%" y2="0%">' +
+                            '<stop offset="0%" style="stop-color:#4fc3f7;stop-opacity:1"/>' +
+                            '<stop offset="100%" style="stop-color:#1a73e8;stop-opacity:1"/>' +
+                        '</linearGradient></defs>' +
+                        '<path d="M5 35 L50 35 L50 15 L95 50 L50 85 L50 65 L5 65 Z" fill="url(#arrowGrad)" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>' +
+                    '</svg>' +
+                    '<div class="big-arrow-label">上楼入口</div>' +
+                '</div>';
+        }
+
+        /* ========== Large ground arrow ========== */
+        .hotspot-big-arrow {
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .hotspot-big-arrow .big-arrow-wrap {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            animation: big-arrow-float 1.8s ease-in-out infinite;
+        }
+        .hotspot-big-arrow .big-arrow-svg {
+            width: 80px;
+            height: 80px;
+            filter: drop-shadow(0 0 16px rgba(26, 115, 232, 0.8))
+                    drop-shadow(0 0 40px rgba(26, 115, 232, 0.4));
+        }
+        .hotspot-big-arrow .big-arrow-label {
+            margin-left: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(26, 115, 232, 0.5);
+            white-space: nowrap;
+        }
+        @keyframes big-arrow-float {
+            0%, 100% { transform: translateX(0); opacity: 0.85; }
+            50% { transform: translateX(10px); opacity: 1; }
         }
 
         // ============================================
