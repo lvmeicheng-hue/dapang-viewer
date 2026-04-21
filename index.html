@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大胖铁锅炖 - 360° 实景指引</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #000;
+            overflow: hidden;
+        }
+        #panorama { width: 100vw; height: 100vh; }
+
+        /* ========== Top navigation bar ========== */
+        .nav-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-bar .back-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-bar .title {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .nav-bar .subtitle {
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            margin-left: auto;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* ========== Staircase hotspot - arrow + text ========== */
+        .hotspot-staircase {
+            position: relative;
+            cursor: pointer;
+        }
+        .hotspot-staircase .staircase-marker {
+            width: 140px;
+            background: linear-gradient(135deg, #1a73e8 0%, #4fc3f7 100%);
+            border-radius: 12px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 20px rgba(26, 115, 232, 0.5), 0 0 40px rgba(79, 195, 247, 0.3);
+            animation: staircase-pulse 2s ease-in-out infinite;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .hotspot-staircase .staircase-arrow {
+            font-size: 28px;
+            line-height: 1;
+            color: #fff;
+            animation: arrow-up-bounce 1.2s ease-in-out infinite;
+            display: block;
+        }
+        .hotspot-staircase .staircase-text {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-top: 4px;
+        }
+        .hotspot-staircase .staircase-sub {
+            color: rgba(255,255,255,0.85);
+            font-size: 10px;
+            margin-top: 2px;
+        }
+        @keyframes staircase-pulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(26, 115, 232, 0.5), 0 0 40px rgba(79, 195, 247, 0.3); }
+            50% { box-shadow: 0 4px 30px rgba(26, 115, 232, 0.8), 0 0 60px rgba(79, 195, 247, 0.5); }
+        }
+        @keyframes arrow-up-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* ========== Signboard blue frame (glow ring) ========== */
+        .hotspot-signboard {
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .hotspot-signboard .sign-frame {
+            border: 4px solid rgba(26, 115, 232, 0.9);
+            border-radius: 6px;
+            box-shadow: 0 0 24px rgba(26, 115, 232, 0.5), inset 0 0 24px rgba(26, 115, 232, 0.12);
+            animation: sign-glow 2s ease-in-out infinite;
+            transition: width 0.08s, height 0.08s, border-width 0.08s;
+        }
+        .hotspot-signboard .sign-label {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 115, 232, 0.85);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 10px;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+        @keyframes sign-glow {
+            0%, 100% {
+                border-color: rgba(26, 115, 232, 0.9);
+                box-shadow: 0 0 24px rgba(26, 115, 232, 0.5), inset 0 0 24px rgba(26, 115, 232, 0.12);
+            }
+            50% {
+                border-color: rgba(79, 195, 247, 1);
+                box-shadow: 0 0 36px rgba(79, 195, 247, 0.7), inset 0 0 36px rgba(79, 195, 247, 0.18);
+            }
+        }
+
+        /* ========== Direction hint overlays ========== */
+        .direction-hint {
+            position: fixed;
+            top: 0;
+            width: 100px;
+            height: 100vh;
+            z-index: 900;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            display: flex;
+            align-items: center;
+        }
+        .direction-hint.visible {
+            opacity: 1;
+        }
+        .direction-hint-right {
+            right: 0;
+            justify-content: flex-end;
+            background: linear-gradient(270deg,
+                rgba(26, 115, 232, 0.5) 0%,
+                rgba(26, 115, 232, 0.15) 40%,
+                rgba(26, 115, 232, 0) 100%);
+        }
+        .direction-hint-left {
+            left: 0;
+            justify-content: flex-start;
+            background: linear-gradient(90deg,
+                rgba(26, 115, 232, 0.5) 0%,
+                rgba(26, 115, 232, 0.15) 40%,
+                rgba(26, 115, 232, 0) 100%);
+        }
+        .direction-hint .hint-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+        }
+        .direction-hint-right .hint-inner {
+            animation: hint-nudge-right 1.2s ease-in-out infinite;
+        }
+        .direction-hint-left .hint-inner {
+            animation: hint-nudge-left 1.2s ease-in-out infinite;
+        }
+        .hint-inner svg {
+            width: 32px;
+            height: 32px;
+            fill: #fff;
+            filter: drop-shadow(0 0 6px rgba(26, 115, 232, 0.8));
+        }
+        .hint-inner .hint-text {
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            writing-mode: vertical-rl;
+            letter-spacing: 3px;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        }
+        @keyframes hint-nudge-right {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(6px); }
+        }
+        @keyframes hint-nudge-left {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-6px); }
+        }
+
+        /* ========== Bottom info card ========== */
+        .info-card {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            max-width: 420px;
+            width: calc(100% - 40px);
+        }
+        .info-card .icon-circle {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .info-card .icon-circle svg {
+            width: 22px; height: 22px;
+            fill: #fff;
+        }
+        .info-card .info-text {
+            flex: 1;
+        }
+        .info-card .info-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .info-card .info-desc {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        .info-card .go-btn {
+            background: linear-gradient(135deg, #1a73e8, #4fc3f7);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* ========== Drag hint ========== */
+        .drag-hint {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px 28px;
+            color: #fff;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 1s ease;
+        }
+        .drag-hint.hidden { opacity: 0; }
+        .drag-hint svg {
+            width: 24px; height: 24px;
+            vertical-align: middle;
+            margin-right: 8px;
+            fill: #fff;
+        }
+
+        /* ========== Hide pannellum defaults ========== */
+        .pnlm-controls-container { display: none !important; }
+        .pnlm-hotspot .pnlm-sprite { display: none !important; }
+        .pnlm-hotspot { background: none !important; width: auto !important; height: auto !important; }
+    </style>
+</head>
+<body>
+    <!-- Top nav bar -->
+    <div class="nav-bar">
+        <button class="back-btn" onclick="history.back()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <span class="title">大胖铁锅炖</span>
+        <span class="subtitle">360° 实景指引</span>
+    </div>
+
+    <!-- Panorama container -->
+    <div id="panorama"></div>
+
+    <!-- Direction hint overlays -->
+    <div class="direction-hint direction-hint-right" id="hintRight">
+        <div class="hint-inner">
+            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+            <span class="hint-text">目的地在右侧</span>
+        </div>
+    </div>
+    <div class="direction-hint direction-hint-left" id="hintLeft">
+        <div class="hint-inner">
+            <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z"/></svg>
+            <span class="hint-text">目的地在左侧</span>
+        </div>
+    </div>
+
+    <!-- Drag hint -->
+    <div class="drag-hint" id="dragHint">
+        <svg viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+        拖拽画面查看全景
+    </div>
+
+    <!-- Bottom info card -->
+    <div class="info-card">
+        <div class="icon-circle">
+            <svg viewBox="0 0 24 24"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2 0v9h9c-.47-4.74-4.24-8.5-9-9zm0 11v9c4.75-.5 8.53-4.26 9-9h-9z"/></svg>
+        </div>
+        <div class="info-text">
+            <div class="info-title">大胖铁锅炖</div>
+            <div class="info-desc">二楼 · 从楼梯口上楼即达</div>
+        </div>
+        <button class="go-btn" onclick="lookAtEntrance()">查看入口</button>
+    </div>
+
+    <script>
+        // ============================================
+        // Configuration - target coordinates for 铁锅炖 sign
+        // In the panoramic image, the storefront is roughly centered (yaw ~0)
+        // The 铁锅炖 sign is on the right portion of the storefront (yaw ~20)
+        // ============================================
+        var TARGET_YAW = 20;          // Center yaw of 铁锅炖 sign
+        var STAIRCASE_YAW = 20;       // Staircase entrance (same area)
+        var STAIRCASE_PITCH = 8;
+        var SIGNBOARD_YAW = 20;       // 铁锅炖 signboard
+        var SIGNBOARD_PITCH = 8;
+
+        // Signboard frame base dimensions (at hfov=100)
+        var BASE_HFOV = 100;
+        var BASE_FRAME_W = 160;
+        var BASE_FRAME_H = 60;
+        var BASE_BORDER = 4;
+
+        // ============================================
+        // Initialize Pannellum viewer
+        // ============================================
+        var viewer = pannellum.viewer('panorama', {
+            type: 'equirectangular',
+            panorama: 'panorama.jpg',
+            autoLoad: true,
+            compass: false,
+            showZoomCtrl: false,
+            showFullscreenCtrl: false,
+            mouseZoom: true,
+            keyboardZoom: false,
+            friction: 0.15,
+            minHfov: 40,
+            maxHfov: 120,
+            hfov: 100,
+            minPitch: -50,
+            maxPitch: 80,
+            yaw: TARGET_YAW,
+            pitch: 5,
+            hotSpotDebug: false,
+
+            hotSpots: [
+                // Signboard blue frame
+                {
+                    pitch: SIGNBOARD_PITCH,
+                    yaw: SIGNBOARD_YAW,
+                    type: 'info',
+                    createTooltipFunc: createSignboardFrame,
+                    createTooltipArgs: {}
+                },
+                // Staircase arrow + text
+                {
+                    pitch: STAIRCASE_PITCH,
+                    yaw: STAIRCASE_YAW,
+                    type: 'info',
+                    createTooltipFunc: createStaircaseHotspot,
+                    createTooltipArgs: {}
+                }
+            ]
+        });
+
+        // ============================================
+        // Hotspot: Staircase arrow + "从此上楼"
+        // ============================================
+        function createStaircaseHotspot(hotSpotDiv, args) {
+            hotSpotDiv.classList.add('hotspot-staircase');
+            hotSpotDiv.innerHTML =
+                '<div class="staircase-marker">' +
+                    '<span class="staircase-arrow">' +
+                        '<svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>' +
+                    '</span>' +
+                    '<div class="staircase-text">在此处上楼</div>' +
+                    '<div class="staircase-sub">大胖铁锅炖 ▸ 二楼</div>' +
+                '</div>';
+        }
+
+        // ============================================
+        // Hotspot: Signboard blue frame
+        // ============================================
+        function createSignboardFrame(hotSpotDiv, args) {
+            hotSpotDiv.classList.add('hotspot-signboard');
+            hotSpotDiv.innerHTML =
+                '<div class="sign-frame" id="signFrame"></div>' +
+                '<div class="sign-label">大胖铁锅炖</div>';
+        }
+
+        // ============================================
+        // Scale signboard frame with zoom level
+        // ============================================
+        function updateSignboardScale() {
+            var frame = document.getElementById('signFrame');
+            if (!frame) return;
+            var hfov = viewer.getHfov();
+            var scale = BASE_HFOV / hfov;
+            frame.style.width = (BASE_FRAME_W * scale) + 'px';
+            frame.style.height = (BASE_FRAME_H * scale) + 'px';
+            frame.style.borderWidth = Math.max(2, BASE_BORDER * scale) + 'px';
+        }
+
+        // ============================================
+        // Direction hints
+        // ============================================
+        var hintRight = document.getElementById('hintRight');
+        var hintLeft = document.getElementById('hintLeft');
+
+        function normalizeAngle(a) {
+            while (a > 180) a -= 360;
+            while (a < -180) a += 360;
+            return a;
+        }
+
+        function updateDirectionHints() {
+            var currentYaw = viewer.getYaw();
+            var hfov = viewer.getHfov();
+            var halfFov = hfov / 2;
+            var diff = normalizeAngle(TARGET_YAW - currentYaw);
+            var threshold = halfFov * 0.75;
+
+            if (diff > threshold) {
+                // Target is to the RIGHT of current view
+                hintRight.classList.add('visible');
+                hintLeft.classList.remove('visible');
+            } else if (diff < -threshold) {
+                // Target is to the LEFT of current view
+                hintLeft.classList.add('visible');
+                hintRight.classList.remove('visible');
+            } else {
+                hintRight.classList.remove('visible');
+                hintLeft.classList.remove('visible');
+            }
+        }
+
+        // ============================================
+        // Animation loop
+        // ============================================
+        function onRenderFrame() {
+            updateSignboardScale();
+            updateDirectionHints();
+            requestAnimationFrame(onRenderFrame);
+        }
+        requestAnimationFrame(onRenderFrame);
+
+        // ============================================
+        // Look at entrance
+        // ============================================
+        function lookAtEntrance() {
+            viewer.lookAt(STAIRCASE_PITCH + 5, STAIRCASE_YAW, 80, 1000);
+        }
+
+        // ============================================
+        // Drag hint auto-hide
+        // ============================================
+        var hintShown = true;
+        document.getElementById('panorama').addEventListener('mousedown', hideDragHint);
+        document.getElementById('panorama').addEventListener('touchstart', hideDragHint);
+        function hideDragHint() {
+            if (hintShown) {
+                document.getElementById('dragHint').classList.add('hidden');
+                hintShown = false;
+                setTimeout(function() {
+                    document.getElementById('dragHint').style.display = 'none';
+                }, 1000);
+            }
+        }
+        setTimeout(function() { hideDragHint(); }, 3000);
+    </script>
+</body>
+</html>
