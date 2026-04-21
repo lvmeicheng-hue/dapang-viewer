@@ -410,12 +410,12 @@
         // - Staircase: below the signboard, at entrance
         // - 2nd floor: "大胖当家" red signboard at top
         // ============================================
-        var TARGET_YAW = 35;          // Center yaw of target area
-        var SIGNBOARD_YAW = 35;       // 铁锅炖 white signboard (red box position)
+        var TARGET_YAW = 40;          // Center yaw of target area
+        var SIGNBOARD_YAW = 42;       // 铁锅炖 white signboard (move right to white sign)
         var SIGNBOARD_PITCH = 10;     // Slightly above center
-        var STAIRCASE_YAW = 35;       // Staircase entrance (below signboard)
-        var STAIRCASE_PITCH = -3;     // Near ground level
-        var SECOND_FLOOR_YAW = 35;    // "大胖当家" 2nd floor sign
+        var STAIRCASE_YAW = 40;       // Staircase entrance (move right, point up)
+        var STAIRCASE_PITCH = 2;      // Move up toward staircase
+        var SECOND_FLOOR_YAW = 30;    // "大胖当家" 2nd floor sign (move left)
         var SECOND_FLOOR_PITCH = 30;  // Upper part of building
 
         // Signboard frame base dimensions (at hfov=100)
@@ -463,10 +463,10 @@
                     createTooltipFunc: createStaircaseHotspot,
                     createTooltipArgs: {}
                 },
-                // Large ground arrow pointing RIGHT toward staircase entrance
+                // Large ground arrow pointing RIGHT toward staircase entrance (moved right, pointing up-right)
                 {
-                    pitch: -8,
-                    yaw: STAIRCASE_YAW - 12,
+                    pitch: -5,
+                    yaw: STAIRCASE_YAW - 8,
                     type: 'info',
                     createTooltipFunc: createBigArrow,
                     createTooltipArgs: { direction: 'right' }
