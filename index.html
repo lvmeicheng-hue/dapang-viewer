@@ -52,7 +52,7 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
-        /* ========== Staircase hotspot - arrow + text ========== */
+        /* ========== Staircase hotspot - "在此处上楼" panel ========== */
         .hotspot-staircase {
             position: relative;
             cursor: pointer;
@@ -291,37 +291,6 @@
         .pnlm-hotspot .pnlm-sprite { display: none !important; }
         .pnlm-hotspot { background: none !important; width: auto !important; height: auto !important; }
 
-        /* ========== Large ground arrow ========== */
-        .hotspot-big-arrow {
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-        }
-        .hotspot-big-arrow .big-arrow-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: big-arrow-float 1.5s ease-in-out infinite;
-        }
-        .hotspot-big-arrow .big-arrow-svg {
-            width: 100px;
-            height: 100px;
-            filter: drop-shadow(0 0 20px rgba(26, 115, 232, 0.9))
-                    drop-shadow(0 0 50px rgba(26, 115, 232, 0.5));
-        }
-        .hotspot-big-arrow .big-arrow-label {
-            margin-top: 4px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 800;
-            letter-spacing: 4px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 0 24px rgba(26, 115, 232, 0.6);
-            white-space: nowrap;
-        }
-        @keyframes big-arrow-float {
-            0%, 100% { transform: translateY(0); opacity: 0.85; }
-            50% { transform: translateY(-12px); opacity: 1; }
-        }
-
         /* ========== 2nd floor destination marker ========== */
         .hotspot-destination {
             transform: translate(-50%, -50%);
@@ -417,8 +386,8 @@
         var TARGET_YAW = 45;          // Center yaw of target area
         var SIGNBOARD_YAW = 48;       // 铁锅炖 white signboard (move right-down)
         var SIGNBOARD_PITCH = 5;      // Move down from 10 to 5
-        var STAIRCASE_YAW = 60;       // Staircase entrance (left 10 degrees)
-        var STAIRCASE_PITCH = 20;     // Move up 10 degrees
+        var STAIRCASE_YAW = 40;       // "在此处上楼" panel (below-left of signboard)
+        var STAIRCASE_PITCH = -5;     // Below the signboard
         var SECOND_FLOOR_YAW = -20;    // "大胖当家" 2nd floor sign (left 25 degrees)
         var SECOND_FLOOR_PITCH = 10;  // Move down another 10 degrees
 
@@ -451,7 +420,7 @@
             hotSpotDebug: false,
 
             hotSpots: [
-                // Blue frame around 铁锅炖 white signboard (red box position)
+                // Blue frame around 铁锅炖 white signboard
                 {
                     pitch: SIGNBOARD_PITCH,
                     yaw: SIGNBOARD_YAW,
@@ -459,21 +428,13 @@
                     createTooltipFunc: createSignboardFrame,
                     createTooltipArgs: {}
                 },
-                // Staircase arrow + "在此处上楼" text (below signboard, pointing to entrance)
+                // "在此处上楼" panel (below-left of signboard, as shown in screenshot)
                 {
                     pitch: STAIRCASE_PITCH,
                     yaw: STAIRCASE_YAW,
                     type: 'info',
                     createTooltipFunc: createStaircaseHotspot,
                     createTooltipArgs: {}
-                },
-                // Large ground arrow pointing UP-RIGHT toward signboard (close to ground, pointing to blue frame)
-                {
-                    pitch: -5,
-                    yaw: SIGNBOARD_YAW - 5,
-                    type: 'info',
-                    createTooltipFunc: createBigArrow,
-                    createTooltipArgs: { direction: 'up-right' }
                 },
                 // 2nd floor destination marker on "大胖当家" signboard
                 {
@@ -487,7 +448,7 @@
         });
 
         // ============================================
-        // Hotspot: Staircase arrow + "从此上楼"
+        // Hotspot: Staircase arrow + "在此处上楼"
         // ============================================
         function createStaircaseHotspot(hotSpotDiv, args) {
             hotSpotDiv.classList.add('hotspot-staircase');
@@ -509,26 +470,6 @@
             hotSpotDiv.innerHTML =
                 '<div class="sign-frame" id="signFrame"></div>' +
                 '<div class="sign-label">铁锅炖上楼处</div>';
-        }
-
-        // ============================================
-        // Hotspot: Large ground arrow pointing to staircase
-        // ============================================
-        function createBigArrow(hotSpotDiv, args) {
-            hotSpotDiv.classList.add('hotspot-big-arrow');
-            // Arrow pointing up-right toward the blue signboard frame
-            var arrowPath = 'M70 95 L60 50 L30 60 L50 5 L70 60 L40 50 L50 95 Z';
-            hotSpotDiv.innerHTML =
-                '<div class="big-arrow-wrap">' +
-                    '<svg class="big-arrow-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
-                        '<defs><linearGradient id="arrowGrad" x1="50%" y1="100%" x2="50%" y2="0%">' +
-                            '<stop offset="0%" style="stop-color:#4fc3f7;stop-opacity:0.8"/>' +
-                            '<stop offset="100%" style="stop-color:#1a73e8;stop-opacity:1"/>' +
-                        '</linearGradient></defs>' +
-                        '<path d="M35 90 L35 45 L15 45 L50 5 L85 45 L65 45 L65 90 Z" fill="url(#arrowGrad)" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>' +
-                    '</svg>' +
-                    '<div class="big-arrow-label">上楼入口</div>' +
-                '</div>';
         }
 
         // ============================================
@@ -604,10 +545,10 @@
         requestAnimationFrame(onRenderFrame);
 
         // ============================================
-        // Look at entrance
+        // Look at staircase entrance
         // ============================================
         function lookAtEntrance() {
-            viewer.lookAt(STAIRCASE_PITCH + 5, STAIRCASE_YAW, 80, 1000);
+            viewer.lookAt(STAIRCASE_PITCH, STAIRCASE_YAW, 80, 1000);
         }
 
         // ============================================
